@@ -305,30 +305,6 @@ coffee-machine-flask/
 
 ---
 
-
-## 🔮 Future Enhancements
-
-### Phase 1 - Features
-- [ ] Add more drink varieties (Mocha, Americano, Macchiato)
-- [ ] Implement drink customization (sugar, size options)
-- [ ] Add loyalty points system
-- [ ] Create admin panel for settings
-
-### Phase 2 - Backend
-- [ ] Integrate database (SQLAlchemy/PostgreSQL)
-- [ ] Add user authentication (Flask-Login)
-- [ ] Implement caching (Redis)
-- [ ] Add logging and monitoring
-
-### Phase 3 - Advanced
-- [ ] Create mobile app (React Native/Flutter)
-- [ ] Add real payment gateway (Stripe/PayPal)
-- [ ] Implement WebSocket for real-time updates
-- [ ] Deploy with Docker containers
-- [ ] Add unit tests (pytest) and CI/CD pipeline
-
----
-
 ## 🚀 Deployment
 
 ### Render
@@ -336,60 +312,7 @@ coffee-machine-flask/
 2. Select "Web Service"
 3. Build: `pip install -r requirements.txt`
 4. Start: `gunicorn app:app`
-
-
-
-## 🤝 Contributing
-
-Contributions are welcome! Here's how:
-
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-### Contribution Guidelines
-- Follow PEP 8 style guide for Python
-- Add comments for complex logic
-- Update README if adding new features
-- Test before submitting PR
-
----
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 👤 Author
-
-**Your Name**
-
-- 💼 LinkedIn: [Your LinkedIn](https://linkedin.com/in/amanjha02)
-- 🐙 GitHub: [@yourusername](https://github.com/yourusername)
-- 📧 Email: kr.amanjha02@gmail.com
-
----
-
-## 🙏 Acknowledgments
-
-- Flask documentation and community
-- Object-Oriented Programming best practices
-- Coffee lovers worldwide ☕
-- Open source community
-
----
-
-## 📊 Project Stats
-
-- **Lines of Code**: ~800
-- **Languages**: Python (70%), JavaScript (20%), HTML/CSS (10%)
-- **API Endpoints**: 7
-- **Classes**: 4
-- **Development Time**: [Add your time]
-
+   
 ---
 
 ## 🔗 Useful Links
