@@ -6,7 +6,7 @@ A full-stack web application that simulates a coffee machine using **Python Flas
 ![Flask](https://img.shields.io/badge/Flask-3.0.0-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-**Live Demo:** [Add your deployment link here]
+**Live Demo:** (https://coffee-machine-simulator.onrender.com)
 
 ## ✨ Features
 
