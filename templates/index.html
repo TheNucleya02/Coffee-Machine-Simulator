@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee Machine Simulator - Flask App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+    </style>
+</head>
+<body class="bg-white min-h-screen">
+    <div class="container mx-auto p-4 md:p-8 max-w-6xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
+                ☕ Coffee Machine Simulator
+            </h1>
+            <p class="text-gray-600">Flask Backend + Python OOP</p>
+        </div>
+
+        <!-- Status Message -->
+        <div id="statusMessage" class="mb-6 p-4 rounded-lg text-center font-medium hidden fade-in"></div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+            <!-- Left Panel - Resources -->
+            <div class="bg-white rounded-xl shadow p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-bold text-gray-800">Resources</h2>
+                    <span class="text-2xl">⚙️</span>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Water -->
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-blue-400">💧</span>
+                                <span class="text-sm font-medium text-gray-700">Water</span>
+                            </div>
+                            <span id="waterAmount" class="text-sm text-gray-500">300ml</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div id="waterBar" class="h-2 rounded-full bg-blue-400 transition-all" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Milk -->
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-gray-400">🥛</span>
+                                <span class="text-sm font-medium text-gray-700">Milk</span>
+                            </div>
+                            <span id="milkAmount" class="text-sm text-gray-500">200ml</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div id="milkBar" class="h-2 rounded-full bg-gray-400 transition-all" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Coffee -->
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-yellow-700">☕</span>
+                                <span class="text-sm font-medium text-gray-700">Coffee</span>
+                            </div>
+                            <span id="coffeeAmount" class="text-sm text-gray-500">100g</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div id="coffeeBar" class="h-2 rounded-full bg-yellow-700 transition-all" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-6 border-t border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="text-green-500">💰</span>
+                            <span class="font-semibold text-gray-700">Total Profit</span>
+                        </div>
+                        <span id="profitAmount" class="text-2xl font-bold text-green-500">$0.00</span>
+                    </div>
+                </div>
+
+                <div class="mt-4 space-y-2">
+                    <button id="powerBtn" onclick="togglePower()" class="w-full py-2 px-4 rounded-lg font-medium bg-gray-200 hover:bg-gray-300 text-gray-800">
+                        🔴 Turn OFF
+                    </button>
+                    <button id="refillBtn" onclick="refillResources()" class="w-full py-2 px-4 rounded-lg font-medium bg-blue-500 hover:bg-blue-600 text-white">
+                        Refill Resources
+                    </button>
+                    <button onclick="toggleReport()" class="w-full py-2 px-4 rounded-lg font-medium bg-white border border-gray-300 hover:bg-gray-100 text-gray-600">
+                        View Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Middle Panel - Menu -->
+            <div class="bg-white rounded-xl shadow p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Menu</h2>
+                <div id="menuContainer" class="space-y-3">
+                    <!-- Menu items loaded dynamically -->
+                </div>
+
+                <!-- Payment Section -->
+                <div id="paymentSection" class="mt-6 p-4 rounded-lg border border-gray-200 bg-gray-50 hidden fade-in">
+                    <h3 class="font-bold mb-3 text-gray-900">Insert Payment</h3>
+                    <p id="selectedDrink" class="text-sm text-gray-600 mb-2"></p>
+                    <input type="number" id="paymentInput" step="0.01" placeholder="Enter amount" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    <div class="flex gap-2">
+                        <button onclick="processPayment()" class="flex-1 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium">Pay Now</button>
+                        <button onclick="cancelOrder()" class="flex-1 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Transactions/Report -->
+            <div class="bg-white rounded-xl shadow p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Recent Transactions</h2>
+                <div id="transactionsContainer" class="space-y-2">
+                    <p class="text-gray-400 text-center py-8">No transactions yet</p>
+                </div>
+                <!-- Report View (hidden by default) -->
+                <div id="reportView" class="space-y-4 hidden">
+                    <div class="p-3 bg-gray-50 rounded-lg">
+                        <p class="text-sm text-gray-600">Water</p>
+                        <p id="reportWater" class="text-xl font-bold text-gray-900">300ml</p>
+                    </div>
+                    <div class="p-3 bg-gray-50 rounded-lg">
+                        <p class="text-sm text-gray-600">Milk</p>
+                        <p id="reportMilk" class="text-xl font-bold text-gray-900">200ml</p>
+                    </div>
+                    <div class="p-3 bg-gray-50 rounded-lg">
+                        <p class="text-sm text-gray-600">Coffee</p>
+                        <p id="reportCoffee" class="text-xl font-bold text-gray-900">100g</p>
+                    </div>
+                    <div class="p-3 bg-gray-50 rounded-lg">
+                        <p class="text-sm text-gray-600">Total Profit</p>
+                        <p id="reportProfit" class="text-xl font-bold text-green-500">$0.00</p>
+                    </div>
+                    <div class="p-3 bg-gray-50 rounded-lg">
+                        <p class="text-sm text-gray-600">Total Orders</p>
+                        <p id="reportOrders" class="text-xl font-bold text-gray-900">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center text-sm text-gray-400">
+            <p>Backend: Python + Flask • Frontend: HTML + JavaScript • OOP Design Pattern</p>
+        </div>
+    </div>
+
+    <!-- JS: All your original logic, unchanged -->
+    <script>
+        let currentDrink = null;
+        let isOn = true;
+        let showingReport = false;
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMenu();
+            updateResources();
+        });
+        async function loadMenu() {
+            try {
+                const response = await fetch('/api/menu');
+                const data = await response.json();
+                const menuContainer = document.getElementById('menuContainer');
+                menuContainer.innerHTML = '';
+                const drinkEmojis = { 'latte': '☕', 'espresso': '🍵', 'cappuccino': '🥤' };
+                data.drinks.forEach(drink => {
+                    const drinkDiv = document.createElement('div');
+                    drinkDiv.className = 'p-4 rounded-lg border border-gray-300 hover:border-blue-400 hover:bg-gray-50 cursor-pointer transition-all';
+                    drinkDiv.onclick = () => selectDrink(drink);
+                    drinkDiv.innerHTML = `
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-3xl">${drinkEmojis[drink.name]}</span>
+                                <div>
+                                    <h3 class="font-bold text-lg capitalize text-gray-900">${drink.name}</h3>
+                                    <p class="text-xs text-gray-600">
+                                        Water: ${drink.ingredients.water}ml | 
+                                        Milk: ${drink.ingredients.milk}ml | 
+                                        Coffee: ${drink.ingredients.coffee}g
+                                    </p>
+                                </div>
+                            </div>
+                            <span class="text-xl font-bold text-green-500">$${drink.cost.toFixed(2)}</span>
+                        </div>
+                    `;
+                    menuContainer.appendChild(drinkDiv);
+                });
+            } catch (error) {
+                showMessage('Error loading menu', 'error');
+            }
+        }
+        function selectDrink(drink) {
+            if (!isOn) {
+                showMessage('Machine is OFF. Please turn it on first.', 'error');
+                return;
+            }
+            currentDrink = drink;
+            document.getElementById('selectedDrink').textContent = 
+                `${drink.name.toUpperCase()} - $${drink.cost.toFixed(2)}`;
+            document.getElementById('paymentSection').classList.remove('hidden');
+            document.getElementById('paymentInput').value = '';
+            document.getElementById('paymentInput').focus();
+            showMessage(`Selected: ${drink.name.toUpperCase()}`, 'info');
+        }
+        async function processPayment() {
+            const payment = parseFloat(document.getElementById('paymentInput').value);
+            if (isNaN(payment) || payment <= 0) {
+                showMessage('Please enter a valid amount', 'error');
+                return;
+            }
+            try {
+                const response = await fetch('/api/order', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        drink_name: currentDrink.name,
+                        payment: payment,
+                        time: new Date().toLocaleTimeString()
+                    })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showMessage(data.message + (data.change > 0 ? ` Change: $${data.change.toFixed(2)}` : ''), 'success');
+                    updateResources();
+                    cancelOrder();
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('Error processing order', 'error');
+            }
+        }
+        function cancelOrder() {
+            currentDrink = null;
+            document.getElementById('paymentSection').classList.add('hidden');
+        }
+        async function updateResources() {
+            try {
+                const response = await fetch('/api/resources');
+                const data = await response.json();
+                const waterPercent = (data.resources.water / 300) * 100;
+                const milkPercent = (data.resources.milk / 200) * 100;
+                const coffeePercent = (data.resources.coffee / 100) * 100;
+                document.getElementById('waterAmount').textContent = `${data.resources.water}ml`;
+                document.getElementById('waterBar').style.width = `${waterPercent}%`;
+                document.getElementById('milkAmount').textContent = `${data.resources.milk}ml`;
+                document.getElementById('milkBar').style.width = `${milkPercent}%`;
+                document.getElementById('coffeeAmount').textContent = `${data.resources.coffee}g`;
+                document.getElementById('coffeeBar').style.width = `${coffeePercent}%`;
+                document.getElementById('profitAmount').textContent = `$${data.profit.toFixed(2)}`;
+                updateTransactions(data.transactions);
+            } catch (error) {
+                console.error('Error updating resources:', error);
+            }
+        }
+        function updateTransactions(transactions) {
+            const container = document.getElementById('transactionsContainer');
+            if (transactions.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-center py-8">No transactions yet</p>';
+                return;
+            }
+            container.innerHTML = '';
+            transactions.forEach(transaction => {
+                const div = document.createElement('div');
+                div.className = 'p-3 bg-gray-50 rounded-lg border border-gray-100 fade-in';
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="font-medium capitalize text-gray-800">${transaction.drink}</p>
+                            <p class="text-xs text-gray-400">${transaction.time}</p>
+                        </div>
+                        <span class="font-bold text-green-500">$${transaction.cost.toFixed(2)}</span>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        async function refillResources() {
+            if (!isOn) {
+                showMessage('Machine is OFF', 'error');
+                return;
+            }
+            try {
+                const response = await fetch('/api/refill', {method: 'POST'});
+                const data = await response.json();
+                if (response.ok) {
+                    showMessage(data.message, 'success');
+                    updateResources();
+                }
+            } catch (error) {
+                showMessage('Error refilling resources', 'error');
+            }
+        }
+        async function togglePower() {
+            try {
+                const response = await fetch('/api/power', {method: 'POST'});
+                const data = await response.json();
+                isOn = data.is_on;
+                const btn = document.getElementById('powerBtn');
+                btn.textContent = isOn ? '🔴 Turn OFF' : '🟢 Turn ON';
+                btn.className = isOn ?
+                    'w-full py-2 px-4 rounded-lg font-medium bg-gray-200 hover:bg-gray-300 text-gray-800' :
+                    'w-full py-2 px-4 rounded-lg font-medium bg-green-500 hover:bg-green-600 text-white';
+                if (!isOn) cancelOrder();
+                showMessage(data.message, 'info');
+            } catch (error) {
+                showMessage('Error toggling power', 'error');
+            }
+        }
+        async function toggleReport() {
+            showingReport = !showingReport;
+            const reportView = document.getElementById('reportView');
+            const transactionsView = document.getElementById('transactionsContainer');
+            if (showingReport) {
+                const response = await fetch('/api/report');
+                const data = await response.json();
+                document.getElementById('reportWater').textContent = `${data.water}ml`;
+                document.getElementById('reportMilk').textContent = `${data.milk}ml`;
+                document.getElementById('reportCoffee').textContent = `${data.coffee}g`;
+                document.getElementById('reportProfit').textContent = `$${data.profit.toFixed(2)}`;
+                document.getElementById('reportOrders').textContent = data.total_orders;
+                reportView.classList.remove('hidden');
+                transactionsView.classList.add('hidden');
+            } else {
+                reportView.classList.add('hidden');
+                transactionsView.classList.remove('hidden');
+            }
+        }
+        function showMessage(message, type) {
+            const msgDiv = document.getElementById('statusMessage');
+            msgDiv.textContent = message;
+            msgDiv.className = `mb-6 p-4 rounded-lg text-center font-medium fade-in ${
+                type === 'success' ? 'bg-green-50 text-green-800' :
+                type === 'error' ? 'bg-red-50 text-red-800' :
+                'bg-blue-50 text-blue-800'
+            }`;
+            msgDiv.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
